@@ -75,16 +75,7 @@ const Index = () => {
     setSidebarOpen(false);
   };
 
-  const simulateStreamingResponse = async (userMessage: string, chatId: string) => {
-    const responses = [
-      "Привет! Я Помогатор — ваш дружелюбный ИИ-ассистент. Чем могу помочь?",
-      "Отличный вопрос! Давайте разберём это пошагово...",
-      "Я понимаю вашу задачу. Вот несколько вариантов решения:",
-      "Это интересная тема! Позвольте мне поделиться своими мыслями на этот счёт.",
-      "Конечно, помогу! Вот подробный ответ на ваш вопрос..."
-    ];
-    
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+  const callPollinationsAPI = async (userMessage: string, chatId: string) => {
     const assistantMessage: Message = {
       id: Date.now().toString() + '_assistant',
       content: '',
@@ -100,9 +91,103 @@ const Index = () => {
         : chat
     ));
 
-    // Имитируем стриминг по символам
-    for (let i = 0; i < randomResponse.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 30));
+    try {
+      const response = await fetch('https://text.pollinations.ai/openai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'openai',
+          messages: [
+            {
+              role: 'system',
+              content: 'Ты дружелюбный ИИ-ассистент по имени Помогатор. Отвечай на русском языке полезно, кратко и дружелюбно.'
+            },
+            {
+              role: 'user',
+              content: userMessage
+            }
+          ],
+          stream: true
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let content = '';
+
+      if (!reader) {
+        throw new Error('No reader available');
+      }
+
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            
+            if (data === '[DONE]') {
+              break;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+              const delta = parsed.choices?.[0]?.delta?.content;
+              
+              if (delta) {
+                content += delta;
+                
+                // Обновляем сообщение с новым контентом
+                setChats(prev => prev.map(chat => 
+                  chat.id === chatId 
+                    ? {
+                        ...chat,
+                        messages: chat.messages.map(msg => 
+                          msg.id === assistantMessage.id 
+                            ? { ...msg, content }
+                            : msg
+                        )
+                      }
+                    : chat
+                ));
+              }
+            } catch (e) {
+              // Игнорируем ошибки парсинга отдельных чанков
+            }
+          }
+        }
+      }
+
+      // Убираем флаг стриминга
+      setChats(prev => prev.map(chat => 
+        chat.id === chatId 
+          ? {
+              ...chat,
+              messages: chat.messages.map(msg => 
+                msg.id === assistantMessage.id 
+                  ? { ...msg, isStreaming: false }
+                  : msg
+              )
+            }
+          : chat
+      ));
+
+    } catch (error) {
+      console.error('Error calling Pollinations API:', error);
+      
+      // В случае ошибки показываем fallback ответ
+      const fallbackContent = 'Извините, произошла ошибка при обращении к API. Попробуйте ещё раз.';
       
       setChats(prev => prev.map(chat => 
         chat.id === chatId 
@@ -110,27 +195,13 @@ const Index = () => {
               ...chat,
               messages: chat.messages.map(msg => 
                 msg.id === assistantMessage.id 
-                  ? { ...msg, content: randomResponse.slice(0, i + 1) }
+                  ? { ...msg, content: fallbackContent, isStreaming: false }
                   : msg
               )
             }
           : chat
       ));
     }
-
-    // Убираем флаг стриминга
-    setChats(prev => prev.map(chat => 
-      chat.id === chatId 
-        ? {
-            ...chat,
-            messages: chat.messages.map(msg => 
-              msg.id === assistantMessage.id 
-                ? { ...msg, isStreaming: false }
-                : msg
-            )
-          }
-        : chat
-    ));
   };
 
   const handleSendMessage = async () => {
@@ -173,8 +244,8 @@ const Index = () => {
         : chat
     ));
 
-    // Симулируем ответ ассистента
-    await simulateStreamingResponse(messageText, chatId);
+    // Получаем ответ от Pollinations API
+    await callPollinationsAPI(messageText, chatId);
     setIsLoading(false);
   };
 
