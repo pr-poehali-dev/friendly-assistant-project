@@ -345,7 +345,7 @@ const Index = () => {
                 <Icon name="Bot" size={18} className="text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Помогатор</h1>
+                <h1 className="text-xl font-semibold text-gray-900">Помогатор (ChatGPT)</h1>
                 <p className="text-sm text-gray-500">Ваш дружелюбный ИИ-ассистент</p>
               </div>
             </div>
