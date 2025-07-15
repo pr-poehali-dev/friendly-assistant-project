@@ -95,30 +95,39 @@ const Index = () => {
     setSidebarOpen(false);
   };
 
-  const buildMessageHistory = (currentChat: Chat, userMessage: string, image?: { url: string; base64: string } | null) => {
+  const buildMessageHistory = (currentChat: Chat | undefined, userMessage: string, image?: { url: string; base64: string } | null) => {
     const systemMessage = {
       role: 'system' as const,
       content: 'Ты дружелюбный ИИ-ассистент по имени Помогатор. Отвечай на русском языке полезно, кратко и дружелюбно. Если получаешь изображение, подробно его опиши и проанализируй.'
     };
 
-    // Берём последние 15 сообщений из истории
-    const recentMessages = currentChat?.messages.slice(-15) || [];
+    // Берём последние 14 сообщений из истории (чтобы с новым было 15)
+    const recentMessages = currentChat?.messages.slice(-14) || [];
     
-    const historyMessages = recentMessages.map(msg => ({
-      role: msg.role,
-      content: msg.image ? [
-        {
-          type: 'text',
-          text: msg.content
-        },
-        {
-          type: 'image_url',
-          image_url: {
-            url: msg.image.base64
-          }
-        }
-      ] : msg.content
-    }));
+    const historyMessages = recentMessages.map(msg => {
+      if (msg.image && msg.image.base64) {
+        return {
+          role: msg.role,
+          content: [
+            {
+              type: 'text',
+              text: msg.content
+            },
+            {
+              type: 'image_url',
+              image_url: {
+                url: msg.image.base64
+              }
+            }
+          ]
+        };
+      } else {
+        return {
+          role: msg.role,
+          content: msg.content
+        };
+      }
+    });
 
     // Добавляем текущее сообщение пользователя
     const currentUserMessage = {
@@ -271,6 +280,9 @@ const Index = () => {
             }
           : chat
       ));
+    } finally {
+      // Всегда убираем состояние загрузки
+      setIsLoading(false);
     }
   };
 
@@ -322,7 +334,6 @@ const Index = () => {
 
     // Получаем ответ от Pollinations API
     await callPollinationsAPI(messageText, chatId, messageImage);
-    setIsLoading(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
