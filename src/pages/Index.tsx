@@ -45,7 +45,12 @@ const Index = () => {
         createdAt: new Date(chat.createdAt),
         messages: chat.messages.map((msg: any) => ({
           ...msg,
-          timestamp: new Date(msg.timestamp)
+          timestamp: new Date(msg.timestamp),
+          // Восстанавливаем URL из base64 для изображений
+          image: msg.image && msg.image.base64 ? {
+            base64: msg.image.base64,
+            url: msg.image.base64 // Используем base64 как URL (data URL)
+          } : undefined
         }))
       }));
       setChats(parsedChats);
@@ -58,7 +63,16 @@ const Index = () => {
   // Сохранение чатов в localStorage при изменении
   useEffect(() => {
     if (chats.length > 0) {
-      localStorage.setItem('helpator-chats', JSON.stringify(chats));
+      // Сохраняем чаты с изображениями в base64 формате
+      const chatsToSave = chats.map(chat => ({
+        ...chat,
+        messages: chat.messages.map(msg => ({
+          ...msg,
+          // Сохраняем base64 данные изображений
+          image: msg.image ? { base64: msg.image.base64 } : undefined
+        }))
+      }));
+      localStorage.setItem('helpator-chats', JSON.stringify(chatsToSave));
     }
   }, [chats]);
 
@@ -81,6 +95,51 @@ const Index = () => {
     setSidebarOpen(false);
   };
 
+  const buildMessageHistory = (currentChat: Chat, userMessage: string, image?: { url: string; base64: string } | null) => {
+    const systemMessage = {
+      role: 'system' as const,
+      content: 'Ты дружелюбный ИИ-ассистент по имени Помогатор. Отвечай на русском языке полезно, кратко и дружелюбно. Если получаешь изображение, подробно его опиши и проанализируй.'
+    };
+
+    // Берём последние 15 сообщений из истории
+    const recentMessages = currentChat?.messages.slice(-15) || [];
+    
+    const historyMessages = recentMessages.map(msg => ({
+      role: msg.role,
+      content: msg.image ? [
+        {
+          type: 'text',
+          text: msg.content
+        },
+        {
+          type: 'image_url',
+          image_url: {
+            url: msg.image.base64
+          }
+        }
+      ] : msg.content
+    }));
+
+    // Добавляем текущее сообщение пользователя
+    const currentUserMessage = {
+      role: 'user' as const,
+      content: image ? [
+        {
+          type: 'text',
+          text: userMessage
+        },
+        {
+          type: 'image_url',
+          image_url: {
+            url: image.base64
+          }
+        }
+      ] : userMessage
+    };
+
+    return [systemMessage, ...historyMessages, currentUserMessage];
+  };
+
   const callPollinationsAPI = async (userMessage: string, chatId: string, image?: { url: string; base64: string } | null) => {
     const assistantMessage: Message = {
       id: Date.now().toString() + '_assistant',
@@ -98,6 +157,7 @@ const Index = () => {
     ));
 
     try {
+      const currentChat = chats.find(chat => chat.id === chatId);
       const response = await fetch('https://text.pollinations.ai/openai', {
         method: 'POST',
         headers: {
@@ -105,27 +165,7 @@ const Index = () => {
         },
         body: JSON.stringify({
           model: 'openai',
-          messages: [
-            {
-              role: 'system',
-              content: 'Ты дружелюбный ИИ-ассистент по имени Помогатор. Отвечай на русском языке полезно, кратко и дружелюбно. Если получаешь изображение, подробно его опиши и проанализируй.'
-            },
-            {
-              role: 'user',
-              content: image ? [
-                {
-                  type: 'text',
-                  text: userMessage
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: image.base64
-                  }
-                }
-              ] : userMessage
-            }
-          ],
+          messages: buildMessageHistory(currentChat, userMessage, image),
           stream: true
         })
       });
