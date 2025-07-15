@@ -13,6 +13,10 @@ interface Message {
   role: 'user' | 'assistant';
   timestamp: Date;
   isStreaming?: boolean;
+  image?: {
+    url: string;
+    base64: string;
+  };
 }
 
 interface Chat {
@@ -28,7 +32,9 @@ const Index = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<{ url: string; base64: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Загрузка чатов из localStorage при монтировании
   useEffect(() => {
@@ -75,7 +81,7 @@ const Index = () => {
     setSidebarOpen(false);
   };
 
-  const callPollinationsAPI = async (userMessage: string, chatId: string) => {
+  const callPollinationsAPI = async (userMessage: string, chatId: string, image?: { url: string; base64: string } | null) => {
     const assistantMessage: Message = {
       id: Date.now().toString() + '_assistant',
       content: '',
@@ -102,11 +108,22 @@ const Index = () => {
           messages: [
             {
               role: 'system',
-              content: 'Ты дружелюбный ИИ-ассистент по имени Помогатор. Отвечай на русском языке полезно, кратко и дружелюбно.'
+              content: 'Ты дружелюбный ИИ-ассистент по имени Помогатор. Отвечай на русском языке полезно, кратко и дружелюбно. Если получаешь изображение, подробно его опиши и проанализируй.'
             },
             {
               role: 'user',
-              content: userMessage
+              content: image ? [
+                {
+                  type: 'text',
+                  text: userMessage
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: image.base64
+                  }
+                }
+              ] : userMessage
             }
           ],
           stream: true
@@ -205,10 +222,15 @@ const Index = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && !selectedImage) || isLoading) return;
 
-    const messageText = input.trim();
+    const messageText = input.trim() || 'Проанализируй это изображение';
+    const messageImage = selectedImage;
     setInput('');
+    setSelectedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     setIsLoading(true);
 
     let chatId = currentChatId;
@@ -230,7 +252,8 @@ const Index = () => {
       id: Date.now().toString(),
       content: messageText,
       role: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      image: messageImage
     };
 
     // Добавляем сообщение пользователя
@@ -245,7 +268,7 @@ const Index = () => {
     ));
 
     // Получаем ответ от Pollinations API
-    await callPollinationsAPI(messageText, chatId);
+    await callPollinationsAPI(messageText, chatId, messageImage);
     setIsLoading(false);
   };
 
@@ -262,6 +285,38 @@ const Index = () => {
     if (currentChatId === chatId) {
       const remainingChats = chats.filter(chat => chat.id !== chatId);
       setCurrentChatId(remainingChats.length > 0 ? remainingChats[0].id : null);
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Пожалуйста, выберите изображение');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      const url = URL.createObjectURL(file);
+      
+      setSelectedImage({
+        url,
+        base64
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeSelectedImage = () => {
+    if (selectedImage) {
+      URL.revokeObjectURL(selectedImage.url);
+      setSelectedImage(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -391,10 +446,21 @@ const Index = () => {
                             ? 'bg-green-500 text-white' 
                             : 'bg-gray-100 text-gray-900'
                         }`}>
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                            {message.content}
-                            {message.isStreaming && <span className="animate-pulse">▊</span>}
-                          </p>
+                          <div>
+                            {message.image && (
+                              <div className="mb-3">
+                                <img 
+                                  src={message.image.url} 
+                                  alt="Загруженное изображение"
+                                  className="max-w-xs rounded-lg shadow-sm"
+                                />
+                              </div>
+                            )}
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                              {message.content}
+                              {message.isStreaming && <span className="animate-pulse">▊</span>}
+                            </p>
+                          </div>
                         </div>
                         {message.role === 'user' && (
                           <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -414,18 +480,60 @@ const Index = () => {
         {/* Input */}
         <div className="border-t p-4 bg-white">
           <div className="max-w-3xl mx-auto">
+            {/* Preview selected image */}
+            {selectedImage && (
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <img 
+                    src={selectedImage.url} 
+                    alt="Предпросмотр"
+                    className="w-12 h-12 object-cover rounded-lg"
+                  />
+                  <span className="text-sm text-gray-600">Изображение выбрано</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={removeSelectedImage}
+                  className="text-gray-400 hover:text-red-500"
+                >
+                  <Icon name="X" size={16} />
+                </Button>
+              </div>
+            )}
+            
             <div className="flex space-x-2">
+              <div className="flex space-x-1">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-gray-500 hover:text-gray-700"
+                  disabled={isLoading}
+                >
+                  <Icon name="Paperclip" size={18} />
+                </Button>
+              </div>
+              
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Напишите сообщение..."
+                placeholder={selectedImage ? "Опишите что нужно сделать с изображением..." : "Напишите сообщение..."}
                 className="flex-1 border-gray-300 focus:border-green-500 focus:ring-green-500"
                 disabled={isLoading}
               />
               <Button 
                 onClick={handleSendMessage}
-                disabled={!input.trim() || isLoading}
+                disabled={(!input.trim() && !selectedImage) || isLoading}
                 className="bg-green-500 hover:bg-green-600 text-white px-6"
               >
                 {isLoading ? (
