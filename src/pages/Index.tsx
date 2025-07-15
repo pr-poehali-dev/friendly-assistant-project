@@ -30,10 +30,8 @@ const Index = () => {
           ...msg,
           timestamp: new Date(msg.timestamp),
           // Восстанавливаем URL из base64 для изображений
-          image: msg.image && msg.image.base64 ? {
-            base64: msg.image.base64,
-            url: msg.image.base64 // Используем base64 как URL (data URL)
-          } : undefined
+          // НЕ восстанавливаем изображения из localStorage
+          image: undefined
         }))
       }));
       setChats(parsedChats);
@@ -46,18 +44,46 @@ const Index = () => {
   // Сохранение чатов в localStorage при изменении
   useEffect(() => {
     if (chats.length > 0) {
-      // Сохраняем чаты с изображениями в base64 формате
-      const chatsToSave = chats.map(chat => ({
-        ...chat,
-        messages: chat.messages.map(msg => ({
-          ...msg,
-          // Сохраняем base64 данные изображений
-          image: msg.image ? { base64: msg.image.base64 } : undefined
-        }))
-      }));
-      localStorage.setItem('helpator-chats', JSON.stringify(chatsToSave));
+      try {
+        // Сохраняем чаты БЕЗ изображений, чтобы не превышать лимит localStorage
+        const chatsToSave = chats.map(chat => ({
+          ...chat,
+          messages: chat.messages.map(msg => ({
+            ...msg,
+            // НЕ сохраняем изображения в localStorage из-за ограничений размера
+            image: msg.image ? { base64: '', url: '' } : undefined
+          }))
+        }));
+        
+        // Проверяем размер перед сохранением
+        const dataSize = JSON.stringify(chatsToSave).length;
+        if (dataSize > 5000000) { // 5MB лимит
+          // Если слишком большой, сохраняем только последние 5 чатов
+          const limitedChats = chatsToSave.slice(0, 5);
+          localStorage.setItem('helpator-chats', JSON.stringify(limitedChats));
+        } else {
+          localStorage.setItem('helpator-chats', JSON.stringify(chatsToSave));
+        }
+      } catch (error) {
+        console.warn('Failed to save chats to localStorage:', error);
+        // Если ошибка, очищаем localStorage и сохраняем только текущий чат
+        try {
+          const currentChatOnly = chats.filter(chat => chat.id === currentChatId).slice(0, 1);
+          const safeChatData = currentChatOnly.map(chat => ({
+            ...chat,
+            messages: chat.messages.map(msg => ({
+              ...msg,
+              image: undefined // Удаляем все изображения
+            }))
+          }));
+          localStorage.setItem('helpator-chats', JSON.stringify(safeChatData));
+        } catch (secondError) {
+          console.error('Failed to save even minimal chat data:', secondError);
+          localStorage.removeItem('helpator-chats');
+        }
+      }
     }
-  }, [chats]);
+  }, [chats, currentChatId]);
 
   const currentChat = chats.find(chat => chat.id === currentChatId);
 
