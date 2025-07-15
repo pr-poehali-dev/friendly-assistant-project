@@ -22,13 +22,45 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
 }) => {
   return (
     <div className="h-full flex flex-col bg-gray-900 text-white">
-      <div className="p-4">
+      <div className="p-4 space-y-3">
         <Button 
           onClick={onCreateNewChat}
           className="w-full bg-transparent border border-gray-600 hover:bg-gray-800 text-white"
         >
           <Icon name="Plus" size={16} className="mr-2" />
           Новый диалог
+        </Button>
+        
+        <Button 
+          onClick={() => {
+            const url = window.location.href;
+            const title = document.title;
+            if (navigator.userAgent.includes('Chrome') || navigator.userAgent.includes('Edge')) {
+              // Chrome/Edge
+              if ((window as any).chrome && (window as any).chrome.runtime) {
+                alert('Используйте Ctrl+D или ⭐ в адресной строке');
+              } else {
+                alert('Используйте Ctrl+D для добавления в закладки');
+              }
+            } else if (navigator.userAgent.includes('Firefox')) {
+              // Firefox
+              alert('Используйте Ctrl+D для добавления в закладки');
+            } else if (navigator.userAgent.includes('Safari')) {
+              // Safari
+              alert('Используйте Cmd+D для добавления в закладки');
+            } else {
+              // Fallback
+              try {
+                (window as any).external.AddFavorite(url, title);
+              } catch {
+                alert('Используйте Ctrl+D для добавления в закладки');
+              }
+            }
+          }}
+          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-yellow-900 font-medium border-0"
+        >
+          <Icon name="Star" size={16} className="mr-2" />
+          Добавить в закладки
         </Button>
       </div>
       
