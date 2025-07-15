@@ -191,6 +191,11 @@ const Index = () => {
         : chat
     ));
 
+    // Отправляем событие в Яндекс.Метрику
+    if (typeof window !== 'undefined' && (window as any).ym) {
+      (window as any).ym(103345566, 'reachGoal', 'message_sent');
+    }
+
     // Получаем ответ от Pollinations API
     await callPollinationsAPI(messageText, chatId, currentChat, messageImage, setChats, setIsLoading);
   };
