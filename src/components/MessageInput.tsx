@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
@@ -25,6 +25,23 @@ const MessageInput: React.FC<MessageInputProps> = ({
   onKeyPress
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Автоматически фокусируемся на поле ввода
+  useEffect(() => {
+    if (inputRef.current && !isLoading) {
+      inputRef.current.focus();
+    }
+  }, [isLoading]);
+
+  // Фокусируемся после отправки сообщения
+  useEffect(() => {
+    if (!input && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [input]);
 
   return (
     <div className="border-t p-4 bg-white">
@@ -73,12 +90,14 @@ const MessageInput: React.FC<MessageInputProps> = ({
           </div>
           
           <Input
+            ref={inputRef}
             value={input}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyPress={onKeyPress}
             placeholder={selectedImage ? "Опишите что нужно сделать с изображением..." : "Напишите сообщение..."}
             className="flex-1 border-gray-300 focus:border-green-500 focus:ring-green-500"
             disabled={isLoading}
+            autoFocus
           />
           <Button 
             onClick={onSendMessage}
