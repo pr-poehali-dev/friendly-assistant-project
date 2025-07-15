@@ -137,6 +137,7 @@ const Index = () => {
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let content = '';
+      let buffer = '';
 
       if (!reader) {
         throw new Error('No reader available');
@@ -147,15 +148,27 @@ const Index = () => {
         
         if (done) break;
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
+        // Добавляем новые данные к буферу
+        buffer += decoder.decode(value, { stream: true });
+        
+        // Разбиваем буфер на строки
+        const lines = buffer.split('\n');
+        
+        // Оставляем последнюю неполную строку в буфере
+        buffer = lines.pop() || '';
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
+          const trimmedLine = line.trim();
+          
+          if (trimmedLine.startsWith('data: ')) {
+            const data = trimmedLine.slice(6).trim();
             
             if (data === '[DONE]') {
               break;
+            }
+
+            if (data === '') {
+              continue;
             }
 
             try {
@@ -180,7 +193,7 @@ const Index = () => {
                 ));
               }
             } catch (e) {
-              // Игнорируем ошибки парсинга отдельных чанков
+              console.warn('Failed to parse SSE data:', data, e);
             }
           }
         }
