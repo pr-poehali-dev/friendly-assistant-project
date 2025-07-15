@@ -95,8 +95,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
             onChange={(e) => onInputChange(e.target.value)}
             onKeyPress={onKeyPress}
             placeholder={selectedImage ? "Опишите что нужно сделать с изображением..." : "Напишите сообщение..."}
-            className="flex-1 border-gray-300 focus:border-green-500 focus:ring-green-500"
-            disabled={isLoading}
+            className="flex-1 border-gray-300 focus:border-green-500 focus:ring-green-500 focus:outline-none"
             autoFocus
           />
           <Button 
