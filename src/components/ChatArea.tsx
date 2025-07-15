@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
+import MarkdownMessage from '@/components/MarkdownMessage';
 import { Chat, Message } from '@/types/chat';
 
 interface ChatAreaProps {
@@ -66,10 +67,16 @@ const ChatArea: React.FC<ChatAreaProps> = ({ currentChat, onExampleClick }) => {
                             />
                           </div>
                         )}
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                          {message.content}
-                          {message.isStreaming && <span className="animate-pulse">▊</span>}
-                        </p>
+                        {message.role === 'assistant' ? (
+                          <MarkdownMessage 
+                            content={message.content} 
+                            isStreaming={message.isStreaming}
+                          />
+                        ) : (
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                            {message.content}
+                          </p>
+                        )}
                       </div>
                     </div>
                     {message.role === 'user' && (
