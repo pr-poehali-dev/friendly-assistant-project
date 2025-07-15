@@ -33,6 +33,11 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         
         <Button 
           onClick={() => {
+            // Отправляем событие в Яндекс.Метрику
+            if (typeof window !== 'undefined' && (window as any).ym) {
+              (window as any).ym(103345566, 'reachGoal', 'favorite_clicked');
+            }
+            
             const url = window.location.href;
             const title = document.title;
             if (navigator.userAgent.includes('Chrome') || navigator.userAgent.includes('Edge')) {
