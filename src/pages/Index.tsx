@@ -249,18 +249,21 @@ const Index = () => {
             </SheetTrigger>
           </Sheet>
           
-          <a 
-            href="https://poehali.dev/?utm_source=pmgtor" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="transition-transform hover:scale-105"
-          >
-            <img 
-              src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
-              alt="Created with poehali.dev" 
-              className="w-auto h-10"
-            />
-          </a>
+          <div className="flex flex-col items-center">
+            <a 
+              href="https://poehali.dev/?utm_source=pmgtor" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="transition-transform hover:scale-105"
+            >
+              <img 
+                src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
+                alt="Created with poehali.dev" 
+                className="w-auto h-10"
+              />
+            </a>
+            <p className="text-sm text-black mt-1">за 15 минут</p>
+          </div>
         </div>
 
         {/* Messages */}
