@@ -240,22 +240,8 @@ const Index = () => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="border-b p-4 flex items-center justify-between bg-white relative">
+        <div className="border-b p-4 flex items-center justify-between bg-white">
           <div className="flex items-center space-x-3">
-            {/* poehali.dev Badge */}
-            <a 
-              href="https://poehali.dev/?utm_source=pmgtor" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="absolute top-2 left-2 transition-transform hover:scale-105 z-10"
-            >
-              <img 
-                src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
-                alt="Created with poehali.dev" 
-                className="w-auto h-6"
-              />
-            </a>
-            
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setSidebarOpen(true)}>
@@ -268,10 +254,18 @@ const Index = () => {
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                 <Icon name="Bot" size={18} className="text-white" />
               </div>
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">Помогатор (ChatGPT 4o)</h1>
-                <p className="text-sm text-gray-500">Ваш дружелюбный ИИ-ассистент</p>
-              </div>
+              <a 
+                href="https://poehali.dev/?utm_source=pmgtor" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="transition-transform hover:scale-105"
+              >
+                <img 
+                  src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
+                  alt="Created with poehali.dev" 
+                  className="w-auto h-8"
+                />
+              </a>
             </div>
           </div>
         </div>
