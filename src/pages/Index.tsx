@@ -212,26 +212,9 @@ const Index = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white">
-      {/* poehali.dev Badge */}
-      <div className="w-full p-4 border-b bg-white">
-        <a 
-          href="https://poehali.dev/?utm_source=pmgtor" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="inline-block transition-transform hover:scale-105"
-        >
-          <img 
-            src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
-            alt="Created with poehali.dev" 
-            className="w-auto h-8"
-          />
-        </a>
-      </div>
-
-      <div className="flex-1 flex">
-        {/* Desktop Sidebar */}
-        <div className="hidden md:block w-64 border-r">
+    <div className="h-screen flex bg-white">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block w-64 border-r">
         <ChatSidebar
           chats={chats}
           currentChatId={currentChatId}
@@ -254,11 +237,25 @@ const Index = () => {
         </SheetContent>
       </Sheet>
 
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col">
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="border-b p-4 flex items-center justify-between bg-white">
+        <div className="border-b p-4 flex items-center justify-between bg-white relative">
           <div className="flex items-center space-x-3">
+            {/* poehali.dev Badge */}
+            <a 
+              href="https://poehali.dev/?utm_source=pmgtor" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="absolute top-2 left-2 transition-transform hover:scale-105 z-10"
+            >
+              <img 
+                src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
+                alt="Created with poehali.dev" 
+                className="w-auto h-6"
+              />
+            </a>
+            
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setSidebarOpen(true)}>
@@ -296,7 +293,6 @@ const Index = () => {
           onSendMessage={handleSendMessage}
           onKeyPress={handleKeyPress}
         />
-        </div>
       </div>
     </div>
   );
