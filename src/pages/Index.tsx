@@ -212,9 +212,26 @@ const Index = () => {
   };
 
   return (
-    <div className="h-screen flex bg-white">
-      {/* Desktop Sidebar */}
-      <div className="hidden md:block w-64 border-r">
+    <div className="h-screen flex flex-col bg-white">
+      {/* poehali.dev Badge */}
+      <div className="w-full p-4 border-b bg-white">
+        <a 
+          href="https://poehali.dev/?utm_source=pmgtor" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="inline-block transition-transform hover:scale-105"
+        >
+          <img 
+            src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
+            alt="Created with poehali.dev" 
+            className="w-auto h-8"
+          />
+        </a>
+      </div>
+
+      <div className="flex-1 flex">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block w-64 border-r">
         <ChatSidebar
           chats={chats}
           currentChatId={currentChatId}
@@ -237,30 +254,29 @@ const Index = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="border-b p-4 flex items-center justify-center bg-white relative">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="md:hidden absolute left-4" onClick={() => setSidebarOpen(true)}>
-                <Icon name="Menu" size={20} />
-              </Button>
-            </SheetTrigger>
-          </Sheet>
-          
-          <a 
-            href="https://poehali.dev/?utm_source=pmgtor" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="transition-transform hover:scale-105"
-          >
-            <img 
-              src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
-              alt="Created with poehali.dev" 
-              className="w-auto h-10"
-            />
-          </a>
+        <div className="border-b p-4 flex items-center justify-between bg-white">
+          <div className="flex items-center space-x-3">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setSidebarOpen(true)}>
+                  <Icon name="Menu" size={20} />
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+            
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                <Icon name="Bot" size={18} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold text-gray-900">Помогатор (ChatGPT 4o)</h1>
+                <p className="text-sm text-gray-500">Ваш дружелюбный ИИ-ассистент</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Messages */}
@@ -280,6 +296,7 @@ const Index = () => {
           onSendMessage={handleSendMessage}
           onKeyPress={handleKeyPress}
         />
+        </div>
       </div>
     </div>
   );
