@@ -302,7 +302,7 @@ const Index = () => {
               <img 
                 src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
                 alt="Created with poehali.dev" 
-                className="w-auto h-8"
+                className="w-auto h-12"
               />
             </a>
           </div>
