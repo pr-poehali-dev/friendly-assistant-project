@@ -279,6 +279,34 @@ const Index = () => {
           onSendMessage={handleSendMessage}
           onKeyPress={handleKeyPress}
         />
+
+        {/* Footer */}
+        <div className="border-t p-4 bg-white">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              <p>Сайт сделан за 15 минут</p>
+              <p>в сервисе <a 
+                href="https://poehali.dev/?utm_source=pmgtor" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 underline"
+              >poehali.dev</a></p>
+            </div>
+            
+            <a 
+              href="https://poehali.dev/?utm_source=pmgtor" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="transition-transform hover:scale-105"
+            >
+              <img 
+                src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
+                alt="Created with poehali.dev" 
+                className="w-auto h-8"
+              />
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
