@@ -212,7 +212,21 @@ const Index = () => {
   };
 
   return (
-    <div className="h-screen flex bg-white">
+    <div className="h-screen flex bg-white relative">
+      {/* poehali.dev Badge */}
+      <a 
+        href="https://poehali.dev/?utm_source=pmgtor" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="absolute top-4 left-4 z-50 transition-transform hover:scale-105"
+      >
+        <img 
+          src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
+          alt="Created with poehali.dev" 
+          className="w-auto h-8"
+        />
+      </a>
+
       {/* Desktop Sidebar */}
       <div className="hidden md:block w-64 border-r">
         <ChatSidebar
