@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
   <circle cx="12" cy="12" r="12" fill="#22c55e"/>
-  <g transform="translate(5, 5) scale(0.6)">
-    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L19 5L21 3L19 1L15 3L13 5V7L15 9H21ZM21 11H15L13 13V15L15 17H21L19 19L21 21L19 23L15 21L13 19V17L15 15H21V11ZM7 12C7 14.76 9.24 17 12 17S17 14.76 17 12S14.76 7 12 7S7 9.24 7 12ZM9 12C9 10.34 10.34 9 12 9S15 10.34 15 12S13.66 15 12 15S9 13.66 9 12Z" fill="white"/>
-  </g>
+  <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L19 5L21 3L19 1L15 3L13 5V7L15 9H21ZM21 11H15L13 13V15L15 17H21L19 19L21 21L19 23L15 21L13 19V17L15 15H21V11ZM7 12C7 14.76 9.24 17 12 17S17 14.76 17 12S14.76 7 12 7S7 9.24 7 12ZM9 12C9 10.34 10.34 9 12 9S15 10.34 15 12S13.66 15 12 15S9 13.66 9 12Z" fill="white"/>
 </svg>
         <linearGradient id="animated_gradient" x1="0%" y1="0%" x2="100%" y2="100%" gradientUnits="userSpaceOnUse">
             <!-- Create more color stops for smoother transition -->
