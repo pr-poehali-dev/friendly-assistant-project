@@ -250,23 +250,18 @@ const Index = () => {
               </SheetTrigger>
             </Sheet>
             
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                <Icon name="Bot" size={18} className="text-white" />
-              </div>
-              <a 
-                href="https://poehali.dev/?utm_source=pmgtor" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="transition-transform hover:scale-105"
-              >
-                <img 
-                  src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
-                  alt="Created with poehali.dev" 
-                  className="w-auto h-8"
-                />
-              </a>
-            </div>
+            <a 
+              href="https://poehali.dev/?utm_source=pmgtor" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="transition-transform hover:scale-105"
+            >
+              <img 
+                src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
+                alt="Created with poehali.dev" 
+                className="w-auto h-10"
+              />
+            </a>
           </div>
         </div>
 
