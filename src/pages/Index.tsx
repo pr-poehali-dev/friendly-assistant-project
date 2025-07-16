@@ -240,29 +240,27 @@ const Index = () => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="border-b p-4 flex items-center justify-between bg-white">
-          <div className="flex items-center space-x-3">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setSidebarOpen(true)}>
-                  <Icon name="Menu" size={20} />
-                </Button>
-              </SheetTrigger>
-            </Sheet>
-            
-            <a 
-              href="https://poehali.dev/?utm_source=pmgtor" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="transition-transform hover:scale-105"
-            >
-              <img 
-                src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
-                alt="Created with poehali.dev" 
-                className="w-auto h-10"
-              />
-            </a>
-          </div>
+        <div className="border-b p-4 flex items-center justify-center bg-white relative">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm" className="md:hidden absolute left-4" onClick={() => setSidebarOpen(true)}>
+                <Icon name="Menu" size={20} />
+              </Button>
+            </SheetTrigger>
+          </Sheet>
+          
+          <a 
+            href="https://poehali.dev/?utm_source=pmgtor" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="transition-transform hover:scale-105"
+          >
+            <img 
+              src="https://cdn.poehali.dev/intertnal/img/created-badge.svg" 
+              alt="Created with poehali.dev" 
+              className="w-auto h-10"
+            />
+          </a>
         </div>
 
         {/* Messages */}
