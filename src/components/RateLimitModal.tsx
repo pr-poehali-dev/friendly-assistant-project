@@ -46,8 +46,8 @@ export const RateLimitModal: React.FC<RateLimitModalProps> = ({
       (window as any).ym(103345566, 'reachGoal', 'subs');
     }
     
-    // Here you would implement payment logic
-    console.log('Unlock unlimited requests clicked');
+    // Show notification that feature is in development
+    alert('Функция в разработке! Скоро будет доступна.');
   };
 
   if (!isOpen) return null;
@@ -73,23 +73,26 @@ export const RateLimitModal: React.FC<RateLimitModalProps> = ({
         {/* Content */}
         <div className="text-center">
           {/* Icon */}
-          <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-6">
-            <Icon name="Clock" size={32} className="text-orange-600" />
+          <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+            <Icon name="Users" size={32} className="text-blue-600" />
           </div>
 
           {/* Title */}
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Лимит запросов исчерпан
+            Вы в живой очереди
           </h2>
 
           {/* Timer */}
           <div className="mb-6">
             <p className="text-gray-600 mb-2">
-              Следующий бесплатный запрос — через
+              Ваше место освободится через
             </p>
-            <div className="text-4xl font-mono font-bold text-orange-600">
+            <div className="text-4xl font-mono font-bold text-blue-600">
               {formatTime(timeRemaining)}
             </div>
+            <p className="text-sm text-gray-500 mt-2">
+              Спасибо за ожидание! 🚀
+            </p>
           </div>
 
           {/* Unlock button */}
@@ -103,7 +106,7 @@ export const RateLimitModal: React.FC<RateLimitModalProps> = ({
 
           {/* Or wait text */}
           <p className="text-sm text-gray-500">
-            или дождитесь окончания таймера
+            или дождитесь освобождения места в очереди
           </p>
         </div>
       </div>

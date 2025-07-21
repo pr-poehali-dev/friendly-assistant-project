@@ -124,7 +124,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
                   : 'bg-yellow-100 text-yellow-700'
             }`}>
               {requestsRemaining === 0 
-                ? 'Лимит исчерпан' 
+                ? 'В очереди' 
                 : `Осталось ${requestsRemaining} ${requestsRemaining === 1 ? 'запрос' : 'запроса'}`
               }
             </span>
