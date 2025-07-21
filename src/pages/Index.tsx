@@ -286,7 +286,6 @@ const Index = () => {
           input={input}
           selectedImage={selectedImage}
           isLoading={isLoading}
-          requestsRemaining={requestsRemaining}
           onInputChange={setInput}
           onImageUpload={handleImageUpload}
           onRemoveImage={removeSelectedImage}

@@ -7,7 +7,6 @@ interface MessageInputProps {
   input: string;
   selectedImage: { url: string; base64: string } | null;
   isLoading: boolean;
-  requestsRemaining?: number;
   onInputChange: (value: string) => void;
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: () => void;
@@ -19,7 +18,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
   input,
   selectedImage,
   isLoading,
-  requestsRemaining,
   onInputChange,
   onImageUpload,
   onRemoveImage,
@@ -113,23 +111,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           </Button>
         </div>
 
-        {/* Rate limit indicator */}
-        {requestsRemaining !== undefined && requestsRemaining <= 3 && (
-          <div className="mt-2 text-center">
-            <span className={`text-sm px-3 py-1 rounded-full ${
-              requestsRemaining === 0 
-                ? 'bg-red-100 text-red-700' 
-                : requestsRemaining <= 1 
-                  ? 'bg-orange-100 text-orange-700'
-                  : 'bg-yellow-100 text-yellow-700'
-            }`}>
-              {requestsRemaining === 0 
-                ? 'В очереди' 
-                : `Осталось ${requestsRemaining} ${requestsRemaining === 1 ? 'запрос' : 'запроса'}`
-              }
-            </span>
-          </div>
-        )}
+
       </div>
     </div>
   );
