@@ -6,7 +6,6 @@ import ChatArea from '@/components/ChatArea';
 import ChatSidebar from '@/components/ChatSidebar';
 import MessageInput from '@/components/MessageInput';
 import RateLimitModal from '@/components/RateLimitModal';
-import Footer from '@/components/Footer';
 import { Chat, Message } from '@/types/chat';
 import { usePollinationsAPI } from '@/hooks/usePollinationsAPI';
 import { useRateLimit } from '@/hooks/useRateLimit';
@@ -302,9 +301,6 @@ const Index = () => {
           onClose={() => setShowRateLimitModal(false)}
           nextRequestTime={nextRequestTime}
         />
-
-        {/* Footer */}
-        <Footer />
       </div>
     </div>
   );
