@@ -5,8 +5,10 @@ import Icon from '@/components/ui/icon';
 import ChatArea from '@/components/ChatArea';
 import ChatSidebar from '@/components/ChatSidebar';
 import MessageInput from '@/components/MessageInput';
+import RateLimitModal from '@/components/RateLimitModal';
 import { Chat, Message } from '@/types/chat';
 import { usePollinationsAPI } from '@/hooks/usePollinationsAPI';
+import { useRateLimit } from '@/hooks/useRateLimit';
 
 const Index = () => {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -15,9 +17,11 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{ url: string; base64: string } | null>(null);
+  const [showRateLimitModal, setShowRateLimitModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { callPollinationsAPI } = usePollinationsAPI();
+  const { canMakeRequest, nextRequestTime, requestsRemaining, recordRequest } = useRateLimit();
 
   // Загрузка чатов из localStorage при монтировании
   useEffect(() => {
@@ -147,6 +151,15 @@ const Index = () => {
 
   const handleSendMessage = async () => {
     if ((!input.trim() && !selectedImage) || isLoading) return;
+    
+    // Check rate limit before sending
+    if (!canMakeRequest) {
+      setShowRateLimitModal(true);
+      return;
+    }
+    
+    // Record the request
+    recordRequest();
 
     const messageText = input.trim() || 'Проанализируй это изображение';
     const messageImage = selectedImage;
@@ -273,6 +286,7 @@ const Index = () => {
           input={input}
           selectedImage={selectedImage}
           isLoading={isLoading}
+          requestsRemaining={requestsRemaining}
           onInputChange={setInput}
           onImageUpload={handleImageUpload}
           onRemoveImage={removeSelectedImage}
@@ -307,6 +321,13 @@ const Index = () => {
             </a>
           </div>
         </div>
+
+        {/* Rate Limit Modal */}
+        <RateLimitModal
+          isOpen={showRateLimitModal}
+          onClose={() => setShowRateLimitModal(false)}
+          nextRequestTime={nextRequestTime}
+        />
       </div>
     </div>
   );
