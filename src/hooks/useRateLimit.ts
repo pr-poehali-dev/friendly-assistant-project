@@ -8,6 +8,7 @@ interface RateLimitData {
   requestCount: number;
   lastRequestTime: number;
   resetTime: number;
+  isInPostFreeMode: boolean; // флаг что пользователь уже потратил 5 бесплатных запросов
 }
 
 export const useRateLimit = () => {
@@ -27,7 +28,8 @@ export const useRateLimit = () => {
           return {
             requestCount: 0,
             lastRequestTime: 0,
-            resetTime: 0
+            resetTime: 0,
+            isInPostFreeMode: data.isInPostFreeMode || false
           };
         }
         
@@ -40,7 +42,8 @@ export const useRateLimit = () => {
     return {
       requestCount: 0,
       lastRequestTime: 0,
-      resetTime: 0
+      resetTime: 0,
+      isInPostFreeMode: false
     };
   };
 
@@ -69,20 +72,38 @@ export const useRateLimit = () => {
       const resetData = {
         requestCount: 0,
         lastRequestTime: 0,
-        resetTime: 0
+        resetTime: 0,
+        isInPostFreeMode: data.isInPostFreeMode
       };
       setRateLimitData(resetData);
-      setCanMakeRequest(true);
-      setNextRequestTime(0);
-      setRequestsRemaining(MAX_FREE_REQUESTS);
-      return true;
+      
+      // Если пользователь уже потратил 5 бесплатных, даем только 1 на 5 минут
+      if (data.isInPostFreeMode) {
+        setCanMakeRequest(true);
+        setNextRequestTime(0);
+        setRequestsRemaining(1);
+        return true;
+      } else {
+        setCanMakeRequest(true);
+        setNextRequestTime(0);
+        setRequestsRemaining(MAX_FREE_REQUESTS);
+        return true;
+      }
     }
     
     // Check if under limit
-    if (data.requestCount < MAX_FREE_REQUESTS) {
+    if (!data.isInPostFreeMode && data.requestCount < MAX_FREE_REQUESTS) {
       setCanMakeRequest(true);
       setNextRequestTime(0);
       setRequestsRemaining(MAX_FREE_REQUESTS - data.requestCount);
+      return true;
+    }
+    
+    // Если пользователь в пост-бесплатном режиме и может сделать запрос
+    if (data.isInPostFreeMode && data.requestCount === 0) {
+      setCanMakeRequest(true);
+      setNextRequestTime(0);
+      setRequestsRemaining(1);
       return true;
     }
     
@@ -99,26 +120,41 @@ export const useRateLimit = () => {
     
     const newCount = data.requestCount + 1;
     let resetTime = data.resetTime;
+    let isInPostFreeMode = data.isInPostFreeMode;
     
-    // If this is the 5th request, set reset time
-    if (newCount >= MAX_FREE_REQUESTS && !resetTime) {
+    // Если это 5-й запрос (и превышаем лимит), ставим таймер и флаг
+    if (newCount >= MAX_FREE_REQUESTS && !resetTime && !isInPostFreeMode) {
+      resetTime = now + COOLDOWN_PERIOD;
+      isInPostFreeMode = true;
+    }
+    
+    // Если пользователь в пост-бесплатном режиме и сделал запрос, ставим таймер на 5 минут
+    if (isInPostFreeMode && newCount === 1) {
       resetTime = now + COOLDOWN_PERIOD;
     }
     
     const newData = {
       requestCount: newCount,
       lastRequestTime: now,
-      resetTime
+      resetTime,
+      isInPostFreeMode
     };
     
     setRateLimitData(newData);
     
     // Update state
-    if (newCount >= MAX_FREE_REQUESTS) {
+    if (isInPostFreeMode) {
+      // В пост-бесплатном режиме после 1 запроса блокируем
+      setCanMakeRequest(false);
+      setNextRequestTime(resetTime);
+      setRequestsRemaining(0);
+    } else if (newCount >= MAX_FREE_REQUESTS) {
+      // Первые 5 запросов закончились
       setCanMakeRequest(false);
       setNextRequestTime(resetTime);
       setRequestsRemaining(0);
     } else {
+      // Остались бесплатные запросы
       setRequestsRemaining(MAX_FREE_REQUESTS - newCount);
     }
   };
@@ -127,7 +163,8 @@ export const useRateLimit = () => {
     const resetData = {
       requestCount: 0,
       lastRequestTime: 0,
-      resetTime: 0
+      resetTime: 0,
+      isInPostFreeMode: false
     };
     setRateLimitData(resetData);
     setCanMakeRequest(true);
