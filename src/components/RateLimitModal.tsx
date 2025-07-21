@@ -98,7 +98,7 @@ export const RateLimitModal: React.FC<RateLimitModalProps> = ({
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl text-lg mb-4 transition-all duration-200 transform hover:scale-105"
           >
             <Icon name="Unlock" size={20} className="mr-2" />
-            Разблокировать безлимитные запросы за 49₽
+            Безлимит за 49₽
           </Button>
 
           {/* Or wait text */}
