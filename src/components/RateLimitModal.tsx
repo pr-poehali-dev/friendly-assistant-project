@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { toast } from 'sonner';
 
 interface RateLimitModalProps {
   isOpen: boolean;
@@ -47,7 +48,9 @@ export const RateLimitModal: React.FC<RateLimitModalProps> = ({
     }
     
     // Show notification that feature is in development
-    alert('Функция в разработке! Скоро будет доступна.');
+    toast.info('Функция в разработке! Скоро будет доступна.', {
+      duration: 3000
+    });
   };
 
   if (!isOpen) return null;
